@@ -1,0 +1,45 @@
+services:
+
+  go-server:
+    build:
+      context: ./go
+      dockerfile: Dockerfile
+
+    container_name: go-server
+
+    ports:
+      - "8080:8080"
+
+    command:
+      - ./go-app
+      - -model-url
+      - http://python-model:8000
+
+    depends_on:
+      python-model:
+        condition: service_healthy
+
+    networks:
+      - engine-net
+
+    restart: unless-stopped
+
+  python-model:
+    build:
+      context: ./python
+      dockerfile: Dockerfile
+
+    container_name: python-model
+
+    expose:
+      - "8000"
+
+    networks:
+      - engine-net
+
+    restart: unless-stopped
+
+networks:
+
+  engine-net:
+    driver: bridge

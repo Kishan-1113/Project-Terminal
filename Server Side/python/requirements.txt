@@ -1,0 +1,9 @@
+# Core ML & NLP Dependencies
+sentence-transformers>=3.0.0
+torch>=2.0.0
+numpy>=1.24.0
+transformers>=4.40.0
+huggingface-hub>=0.20.0
+
+fastapi
+uvicorn
