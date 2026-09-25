@@ -506,7 +506,7 @@ func (s *LocalServer) serveGUI(w http.ResponseWriter, r *http.Request) {
 // included. The Go binary embeds that executable so the default launch path
 // has no Python or pip dependency on the target machine.
 //
-//go:embed terminal.exe
+
 var embeddedTerminalGUI []byte
 
 func extractEmbeddedGUI() (string, string, error) {

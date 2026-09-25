@@ -2,7 +2,7 @@ services:
 
   go-server:
     build:
-      context: ./go
+      context: .
       dockerfile: Dockerfile
 
     container_name: go-server

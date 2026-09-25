@@ -3,8 +3,8 @@ import re
 
 import numpy as np
 
-# from fastapi import FastAPI, HTTPException
-# from pydantic import BaseModel
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 
 from sentence_transformers import SentenceTransformer
 
@@ -46,26 +46,16 @@ emb = model.encode(
 )
 
 
-# ---------------------------------------------------------
-# FastAPI
-# ---------------------------------------------------------
-
-# app = FastAPI()
+app = FastAPI()
 
 
-# ---------------------------------------------------------
-# HTTP request / response models
-# ---------------------------------------------------------
-
-# class PredictRequest(BaseModel):
-
-#     input: str
+class PredictRequest(BaseModel):
+    input: str
 
 
-# class PredictResponse(BaseModel):
-
-#     output: str
-#     error: str = ""
+class PredictResponse(BaseModel):
+    output: str
+    error: str = ""
 
 
 # ---------------------------------------------------------
@@ -94,7 +84,6 @@ def classify(query, threshold=0.75):
     )
 
 
-# ---------------------------------------------------------
 # Slot extraction
 # ---------------------------------------------------------
 
@@ -214,50 +203,19 @@ def run(text):
     }
 
 
-while (True):
-    print(run(input()))
+@app.post("/predict", response_model=PredictResponse)
+def predict(request: PredictRequest):
+    user_input = request.input.strip()
+    if not user_input:
+        raise HTTPException(status_code=400, detail="Missing input")
+
+    try:
+        result = run(user_input)
+        return PredictResponse(**result)
+    except Exception as exc:
+        return PredictResponse(output="", error=str(exc))
 
 
-# ---------------------------------------------------------
-# HTTP endpoint
-# ---------------------------------------------------------
-
-# @app.post(
-#     "/predict",
-#     response_model=PredictResponse
-# )
-# def predict(request: PredictRequest):
-#     user_input = request.input.strip()
-
-#     if not user_input:
-#         raise HTTPException(
-#             status_code=400,
-#             detail="Missing input"
-#         )
-
-#     try:
-#         result = run(
-#             user_input
-#         )
-
-#         return PredictResponse(
-#             output=result["output"],
-#             error=result["error"]
-#         )
-
-#     except Exception as e:
-#         return PredictResponse(
-#             output="",
-#             error=str(e)
-#         )
-
-
-# # ---------------------------------------------------------
-# # Health endpoint
-# # ---------------------------------------------------------
-
-# @app.get("/healthz")
-# def healthz():
-#     return {
-#         "status": "ok"
-#     }
+@app.get("/healthz")
+def healthz():
+    return {"status": "ok"}
